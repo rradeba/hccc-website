@@ -1,0 +1,27 @@
+{
+  "name": "Holy City Clean Co.",
+  "short_name": "HCCC",
+  "description": "Professional pressure washing and soft washing for homes and businesses. Free quotes, insured, and eco-friendly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/src/assets/hccc-blue-logo.PNG",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/src/assets/hccc-blue-logo.PNG",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "cleaning", "services"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Data Test</title>
+</head>
+<body>
+    <h2>Test Multiple Checkbox Form Data</h2>
+    <form id="testForm">
+        <h3>Services:</h3>
+        <label>
+            <input type="checkbox" name="service" value="exterior"> Home/Business Exterior
+        </label><br>
+        <label>
+            <input type="checkbox" name="service" value="concrete"> Concrete Pressure Washing
+        </label><br>
+        <label>
+            <input type="checkbox" name="service" value="deck"> Deck/Fence Cleaning
+        </label><br>
+        <label>
+            <input type="checkbox" name="service" value="other"> Other
+        </label><br><br>
+        
+        <button type="button" onclick="testFormData()">Test FormData</button>
+        <button type="button" onclick="testURLSearchParams()">Test URLSearchParams</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        function testFormData() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            console.log('=== FormData Test ===');
+            console.log('FormData entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            console.log('Processed data object:', data);
+            console.log('Service field:', data.service);
+            console.log('Service is array?', Array.isArray(data.service));
+            
+            document.getElementById('output').innerHTML += '<h3>FormData Test Results:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+        
+        function testURLSearchParams() {
+            const form = document.getElementById('testForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Process FormData into object first
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Convert to URLSearchParams
+            const urlParams = new URLSearchParams();
+            Object.entries(data).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    value.forEach(v => urlParams.append(key, v));
+                } else {
+                    urlParams.append(key, value);
+                }
+            });
+            
+            console.log('=== URLSearchParams Test ===');
+            console.log('URLSearchParams string:', urlParams.toString());
+            console.log('Service values:', urlParams.getAll('service'));
+            
+            document.getElementById('output').innerHTML += '<h3>URLSearchParams Test Results:</h3><pre>String: ' + urlParams.toString() + '\nService values: ' + JSON.stringify(urlParams.getAll('service')) + '</pre>';
+        }
+    </script>
+</body>
+</html>
