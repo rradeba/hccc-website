@@ -3,10 +3,11 @@
 
 [build]
   publish = "dist"
-  command = "npm run build"
+  command = "npm ci && npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
   
 # Use Ubuntu Focal 20.04 build image
 [build.image]
