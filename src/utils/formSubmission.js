@@ -1,91 +1,44 @@
-// Form submission utility for Google Sheets integration
-import { GOOGLE_APPS_SCRIPT_URL } from '../config/googleSheets.js';
+// Form submission utility for Flask backend integration
+// import { GOOGLE_APPS_SCRIPT_URL } from '../config/googleSheets.js';
 import { withRateLimit } from './rateLimiter.js';
 
-const API_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL;
+// Backend API URL - update this to your hosted backend
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5050';
 
 // Internal submission function (without rate limiting)
-const _submitToGoogleSheets = async (formData) => {
+const _submitToBackend = async (formData) => {
   console.log('API_URL:', API_URL);
   console.log('Form data being sent:', formData);
-  console.log('Other details field:', formData.otherDetails);
-  console.log('Service field:', formData.service);
-  console.log('All form data keys:', Object.keys(formData));
-  console.log('Full form data object:', JSON.stringify(formData, null, 2));
 
   if (!API_URL) {
-    throw new Error('Google Apps Script URL not configured');
+    throw new Error('Backend API URL not configured');
   }
 
   try {
-    console.log('Sending request to:', API_URL);
+    console.log('Sending request to:', `${API_URL}/api/leads`);
 
-    // Use URLSearchParams for better Google Apps Script compatibility
-    const body = new URLSearchParams();
-    console.log('=== CONVERTING TO URLSEARCHPARAMS ===');
-    Object.entries(formData).forEach(([key, value]) => {
-      console.log(`Processing ${key}:`, value, `(type: ${typeof value})`);
-      if (Array.isArray(value)) {
-        console.log(`${key} is array with ${value.length} items:`, value);
-        value.forEach((v, index) => {
-          console.log(`  Appending ${key}[${index}]:`, v);
-          body.append(key, v);
-        });
-      } else {
-        console.log(`${key} is single value:`, value);
-        body.append(key, value || ''); // Ensure empty strings are sent
-      }
-    });
-
-    console.log('Form data being sent as URLSearchParams:', body.toString());
-    
-    // Let's also check what URLSearchParams thinks about the service field
-    const serviceValues = body.getAll('service');
-    console.log('Service values in URLSearchParams:', serviceValues);
-
-    let response = await fetch(API_URL, {
+    // Send as JSON to Flask backend
+    const response = await fetch(`${API_URL}/api/leads`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: body.toString(),
+      body: JSON.stringify(formData),
     });
 
     console.log('Response status:', response.status);
 
-    // Apps Script may return text; try to parse JSON, fallback to text
-    const text = await response.text();
-    console.log('Raw response:', text);
-    
-    try {
-      const json = JSON.parse(text);
-      console.log('Parsed JSON response:', json);
-      
-      // Check if the response indicates success
-      if (json.success === false) {
-        throw new Error(json.message || 'Google Sheets submission failed');
-      }
-      
-      // If success is true or undefined, consider it successful
-      return { success: true, message: json.message || 'Data saved to Google Sheets' };
-    } catch (parseError) {
-      console.log('Could not parse JSON, treating as text response:', text);
-      
-      // If we can't parse JSON, check if it's a success message
-      if (text.includes('success') || text.includes('saved') || text.includes('received')) {
-        return { success: true, message: 'Data saved to Google Sheets' };
-      }
-      
-      // If response is not ok, throw error
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-      }
-      
-      // Default to success if response is ok
-      return { success: true, message: 'Data saved to Google Sheets' };
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
+
+    const result = await response.json();
+    console.log('Backend response:', result);
+    
+    return { success: true, message: 'Lead submitted successfully' };
   } catch (error) {
-    console.error('Error submitting to Google Sheets:', error);
+    console.error('Error submitting to backend:', error);
     throw error;
   }
 };
@@ -119,12 +72,30 @@ export const formatFormData = (formElement) => {
   }
   
   // Ensure all expected fields are present, even if empty
-  const expectedFields = ['name', 'email', 'phone', 'address', 'referrer', 'service', 'otherDetails', 'notes'];
+  const expectedFields = ['firstName', 'lastName', 'name', 'email', 'phone', 'streetAddress', 'city', 'state', 'zip', 'address', 'referrer', 'service', 'otherDetails', 'notes'];
   expectedFields.forEach(field => {
     if (!data.hasOwnProperty(field)) {
       data[field] = '';
     }
   });
+
+  // Build combined name from first and last if present
+  if ((!data.name || data.name.trim().length === 0) && (data.firstName || data.lastName)) {
+    data.name = `${(data.firstName || '').trim()} ${(data.lastName || '').trim()}`.trim();
+  }
+
+  // Build combined address from parts if present
+  if ((data.streetAddress || data.city || data.state || data.zip)) {
+    const parts = [
+      (data.streetAddress || '').trim(),
+      (data.city || '').trim(),
+      [ (data.state || '').trim(), (data.zip || '').trim() ].filter(Boolean).join(' ')
+    ].filter(Boolean)
+    const combined = parts.join(', ')
+    if (combined && combined.length > 0) {
+      data.address = combined
+    }
+  }
   
   // SECURITY: Add required security fields
   data.apiKey = 'HCCC_SECURE_2024_Kj8mN9pQ2wX5vB7nM3kL9sR4tY6uI8oP'; // Must match server-side secret
@@ -160,8 +131,14 @@ export const formatFormData = (formElement) => {
 export const validateFormData = (data) => {
   const errors = [];
   
+  if (!data.firstName || data.firstName.trim().length < 1) {
+    errors.push('First name is required');
+  }
+  if (!data.lastName || data.lastName.trim().length < 1) {
+    errors.push('Last name is required');
+  }
   if (!data.name || data.name.trim().length < 2) {
-    errors.push('Name must be at least 2 characters long');
+    errors.push('Full name must be at least 2 characters long');
   }
   
   if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
@@ -172,6 +149,19 @@ export const validateFormData = (data) => {
     errors.push('Please enter a valid phone number');
   }
   
+  // Validate address parts and combined address
+  if (!data.streetAddress || data.streetAddress.trim().length < 3) {
+    errors.push('Street address is required');
+  }
+  if (!data.city || data.city.trim().length < 2) {
+    errors.push('City is required');
+  }
+  if (!data.state || data.state.trim().length < 2) {
+    errors.push('State is required');
+  }
+  if (!data.zip || data.zip.trim().length < 5) {
+    errors.push('ZIP code is required');
+  }
   if (!data.address || data.address.trim().length < 5) {
     errors.push('Please enter a complete address');
   }
@@ -195,5 +185,5 @@ export const validateFormData = (data) => {
 };
 
 // Rate-limited submission function (10 submissions per 10 minutes)
-export const submitToGoogleSheets = withRateLimit(_submitToGoogleSheets, 10, 10 * 60 * 1000);
+export const submitToGoogleSheets = withRateLimit(_submitToBackend, 10, 10 * 60 * 1000);
 

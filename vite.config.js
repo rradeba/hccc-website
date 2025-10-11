@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ['**/*.mov'],
   build: {
     // Optimize build for production
     minify: 'terser',
@@ -29,9 +30,20 @@ export default defineConfig({
   },
   // Development server configuration
   server: {
-    port: 3000,
+    port: 5173,
     open: true,
     cors: true,
+    host: true,
+    strictPort: true,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      clientPort: 5173,
+      overlay: true,
+    },
+    watch: {
+      usePolling: true,
+    },
   },
   // Optimize dependencies
   optimizeDeps: {
@@ -42,3 +54,4 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
   },
 })
+poopoo

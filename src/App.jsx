@@ -113,13 +113,29 @@ function Home() {
         <div className="hero-video-wrap">
           <video
             className="hero-video"
-            src={homeVideo}
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
-          />
+            controls={false}
+            controlsList="nodownload noplaybackrate noremoteplayback nofullscreen"
+            disablePictureInPicture
+            onContextMenu={(e) => e.preventDefault()}
+            preload="metadata"
+            poster={logoImg}
+          >
+            {/* Prefer widely-supported MP4 if available in /public */}
+            <source src="/Home-video.mp4" type="video/mp4" />
+            <source src={homeVideo} type="video/quicktime" />
+            Your browser does not support the video tag.
+          </video>
+          {/* Fallback link in case neither source plays */}
+          <noscript>
+            <p>
+              Video preview requires JavaScript. You can
+              <a href="/Home-video.mp4"> download the video</a> instead.
+            </p>
+          </noscript>
           <a className="phone-badge" href="tel:18436096932" aria-label="Call Holy City Clean Co. for a free estimate">
             <span className="phone-badge-ring" aria-hidden="true"></span>
             <span className="phone-badge-text">
@@ -269,13 +285,15 @@ function Quote() {
         // Create field-specific error highlighting
         const newFieldErrors = {}
         validationErrors.forEach(error => {
-          if (error.includes('Name')) newFieldErrors.name = true
-          if (error.includes('email')) newFieldErrors.email = true
-          if (error.includes('phone')) newFieldErrors.phone = true
-          if (error.includes('address')) newFieldErrors.address = true
-          if (error.includes('referrer')) newFieldErrors.referrer = true
-          if (error.includes('service')) newFieldErrors.service = true
-          if (error.includes('other services')) newFieldErrors.otherDetails = true
+          const lower = error.toLowerCase()
+          if (lower.includes('first name')) newFieldErrors.firstName = true
+          if (lower.includes('last name')) newFieldErrors.lastName = true
+          if (lower.includes('email')) newFieldErrors.email = true
+          if (lower.includes('phone')) newFieldErrors.phone = true
+          if (lower.includes('address')) newFieldErrors.address = true
+          if (lower.includes('referrer')) newFieldErrors.referrer = true
+          if (lower.includes('service')) newFieldErrors.service = true
+          if (lower.includes('other services')) newFieldErrors.otherDetails = true
         })
         
         setFieldErrors(newFieldErrors)
@@ -313,17 +331,30 @@ function Quote() {
         <h3>Contact Information <span className="required-note">* All fields required</span></h3>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="q-name" className={fieldErrors.name ? 'error-label' : ''}>Name *</label>
+            <label htmlFor="q-first-name" className={fieldErrors.firstName ? 'error-label' : ''}>First Name *</label>
             <input 
-              id="q-name" 
-              name="name" 
+              id="q-first-name" 
+              name="firstName" 
               type="text" 
-              placeholder="Your full name" 
+              placeholder="First name" 
               required 
-              className={fieldErrors.name ? 'error-input' : ''}
-              onChange={() => clearFieldError('name')}
+              className={fieldErrors.firstName ? 'error-input' : ''}
+              onChange={() => clearFieldError('firstName')}
             />
-            {fieldErrors.name && <span className="field-error">Name is required</span>}
+            {fieldErrors.firstName && <span className="field-error">First name is required</span>}
+          </div>
+          <div className="form-group">
+            <label htmlFor="q-last-name" className={fieldErrors.lastName ? 'error-label' : ''}>Last Name *</label>
+            <input 
+              id="q-last-name" 
+              name="lastName" 
+              type="text" 
+              placeholder="Last name" 
+              required 
+              className={fieldErrors.lastName ? 'error-input' : ''}
+              onChange={() => clearFieldError('lastName')}
+            />
+            {fieldErrors.lastName && <span className="field-error">Last name is required</span>}
           </div>
           <div className="form-group">
             <label htmlFor="q-phone" className={fieldErrors.phone ? 'error-label' : ''}>Phone *</label>
@@ -341,18 +372,114 @@ function Quote() {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="q-address" className={fieldErrors.address ? 'error-label' : ''}>Address *</label>
+            <label htmlFor="q-street" className={fieldErrors.streetAddress ? 'error-label' : ''}>Street *</label>
             <input 
-              id="q-address" 
-              name="address" 
+              id="q-street" 
+              name="streetAddress" 
               type="text" 
-              placeholder="Street, City, State" 
+              placeholder="Street" 
               required 
-              className={fieldErrors.address ? 'error-input' : ''}
-              onChange={() => clearFieldError('address')}
+              className={fieldErrors.streetAddress ? 'error-input' : ''}
+              onChange={() => clearFieldError('streetAddress')}
             />
-            {fieldErrors.address && <span className="field-error">Address is required</span>}
+            {fieldErrors.streetAddress && <span className="field-error">Street address is required</span>}
           </div>
+          <div className="form-group">
+            <label htmlFor="q-city" className={fieldErrors.city ? 'error-label' : ''}>City *</label>
+            <input 
+              id="q-city" 
+              name="city" 
+              type="text" 
+              placeholder="City" 
+              required 
+              className={fieldErrors.city ? 'error-input' : ''}
+              onChange={() => clearFieldError('city')}
+            />
+            {fieldErrors.city && <span className="field-error">City is required</span>}
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="q-state" className={fieldErrors.state ? 'error-label' : ''}>State *</label>
+            <select
+              id="q-state"
+              name="state"
+              required
+              className={fieldErrors.state ? 'error-input' : ''}
+              onChange={() => clearFieldError('state')}
+              defaultValue=""
+            >
+              <option value="" disabled>Select state</option>
+              <option value="AL">AL</option>
+              <option value="AK">AK</option>
+              <option value="AZ">AZ</option>
+              <option value="AR">AR</option>
+              <option value="CA">CA</option>
+              <option value="CO">CO</option>
+              <option value="CT">CT</option>
+              <option value="DE">DE</option>
+              <option value="DC">DC</option>
+              <option value="FL">FL</option>
+              <option value="GA">GA</option>
+              <option value="HI">HI</option>
+              <option value="ID">ID</option>
+              <option value="IL">IL</option>
+              <option value="IN">IN</option>
+              <option value="IA">IA</option>
+              <option value="KS">KS</option>
+              <option value="KY">KY</option>
+              <option value="LA">LA</option>
+              <option value="ME">ME</option>
+              <option value="MD">MD</option>
+              <option value="MA">MA</option>
+              <option value="MI">MI</option>
+              <option value="MN">MN</option>
+              <option value="MS">MS</option>
+              <option value="MO">MO</option>
+              <option value="MT">MT</option>
+              <option value="NE">NE</option>
+              <option value="NV">NV</option>
+              <option value="NH">NH</option>
+              <option value="NJ">NJ</option>
+              <option value="NM">NM</option>
+              <option value="NY">NY</option>
+              <option value="NC">NC</option>
+              <option value="ND">ND</option>
+              <option value="OH">OH</option>
+              <option value="OK">OK</option>
+              <option value="OR">OR</option>
+              <option value="PA">PA</option>
+              <option value="RI">RI</option>
+              <option value="SC">SC</option>
+              <option value="SD">SD</option>
+              <option value="TN">TN</option>
+              <option value="TX">TX</option>
+              <option value="UT">UT</option>
+              <option value="VT">VT</option>
+              <option value="VA">VA</option>
+              <option value="WA">WA</option>
+              <option value="WV">WV</option>
+              <option value="WI">WI</option>
+              <option value="WY">WY</option>
+            </select>
+            {fieldErrors.state && <span className="field-error">State is required</span>}
+          </div>
+          <div className="form-group">
+            <label htmlFor="q-zip" className={fieldErrors.zip ? 'error-label' : ''}>ZIP Code *</label>
+            <input 
+              id="q-zip" 
+              name="zip" 
+              type="text" 
+              placeholder="29401" 
+              required 
+              className={fieldErrors.zip ? 'error-input' : ''}
+              onChange={() => clearFieldError('zip')}
+            />
+            {fieldErrors.zip && <span className="field-error">ZIP code is required</span>}
+          </div>
+        </div>
+        <div className="form-row">
           <div className="form-group">
             <label htmlFor="q-email" className={fieldErrors.email ? 'error-label' : ''}>Email *</label>
             <input 

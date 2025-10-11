@@ -15,8 +15,8 @@ const API_SECRET = 'HCCC_FORM_SECRET_2024_CHANGE_THIS';
 const ALLOWED_ORIGINS = [
   'https://your-domain.com',
   'https://www.your-domain.com',
-  'http://localhost:3000',  // Remove this in production
-  'http://localhost:3001'   // Remove this in production
+  'http://localhost:5173',  // Remove this in production
+  'http://localhost:5173'   // Remove this in production
 ];
 
 // SECURITY: Rate limiting configuration
@@ -542,3 +542,7 @@ function errorResponse(message) {
     }))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+
+
+
