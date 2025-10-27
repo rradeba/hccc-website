@@ -3,7 +3,7 @@
 import { withRateLimit } from './rateLimiter.js';
 
 // Backend API URL - Railway backend
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://hccc-db-production.up.railway.app';
+const API_URL = 'https://hccc-db-production.up.railway.app';
 
 // Internal submission function (without rate limiting)
 const _submitToBackend = async (formData) => {
