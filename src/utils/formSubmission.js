@@ -2,8 +2,8 @@
 // import { GOOGLE_APPS_SCRIPT_URL } from '../config/googleSheets.js';
 import { withRateLimit } from './rateLimiter.js';
 
-// Backend API URL - update this to your hosted backend
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5050';
+// Backend API URL - Railway backend
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://hccc-db-production.up.railway.app';
 
 // Internal submission function (without rate limiting)
 const _submitToBackend = async (formData) => {
