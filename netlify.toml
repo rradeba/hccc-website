@@ -42,18 +42,18 @@
     # Control referrer information
     Referrer-Policy = "strict-origin-when-cross-origin"
     
-    # Content Security Policy - allows Google Apps Script
+    # Content Security Policy
     Content-Security-Policy = '''
       default-src 'self';
-      script-src 'self' 'unsafe-inline' https://script.google.com https://script.googleusercontent.com;
+      script-src 'self' 'unsafe-inline';
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https:;
-      connect-src 'self' http://localhost:5050 https://script.google.com https://script.googleusercontent.com https://hccc-db-production.up.railway.app;
+      connect-src 'self' https://hccc-db-production.up.railway.app;
       font-src 'self' data:;
       media-src 'self';
       object-src 'none';
       base-uri 'self';
-      form-action 'self' https://script.google.com;
+      form-action 'self';
       frame-ancestors 'none';
     '''
     
