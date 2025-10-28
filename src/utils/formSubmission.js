@@ -24,13 +24,21 @@ const _submitToBackend = async (formData) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
+      mode: 'cors',
     });
 
     console.log('Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      
+      // Check for validation errors from backend
+      if (errorData.errors) {
+        const errorMessages = Object.values(errorData.errors);
+        throw new Error(errorMessages.join(', '));
+      }
+      
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
@@ -39,6 +47,12 @@ const _submitToBackend = async (formData) => {
     return { success: true, message: 'Lead submitted successfully' };
   } catch (error) {
     console.error('Error submitting to backend:', error);
+    
+    // Provide more specific error messages
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Unable to connect to server. Please check your internet connection.');
+    }
+    
     throw error;
   }
 };
