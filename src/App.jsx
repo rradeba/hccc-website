@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import logoImg from './assets/hccc-gate.png'
 import homeVideo from './assets/Home-video.mov'
 import headshotImg from './assets/headshot.png'
@@ -8,7 +9,19 @@ import before2 from './assets/before 2.jpeg'
 import after2 from './assets/after-2.jpeg'
 import { submitToGoogleSheets, formatFormData, validateFormData } from './utils/formSubmission'
 import { performanceMonitor, optimizeImages, preloadCriticalResources } from './utils/performance.js'
+import { API_URL } from './config/api.js'
 import './App.css'
+
+const CRMPage = lazy(async () => {
+  if (typeof globalThis.process === 'undefined') {
+    globalThis.process = { env: {} }
+  } else if (!globalThis.process.env) {
+    globalThis.process.env = {}
+  }
+  globalThis.process.env.REACT_APP_BACKEND_URL = API_URL
+  const module = await import('@crm/App.jsx')
+  return { default: module.default }
+})
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -577,7 +590,7 @@ function Quote() {
   )
 }
 
-export default function App() {
+function LandingPage() {
   useEffect(() => {
     // Start performance monitoring
     performanceMonitor.start();
@@ -610,4 +623,26 @@ export default function App() {
     </>
   )
 }
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+            Loading dashboard…
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/route" element={<CRMPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
+}
+
+export { LandingPage }
 

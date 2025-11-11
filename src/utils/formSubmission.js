@@ -2,8 +2,8 @@
 // import { GOOGLE_APPS_SCRIPT_URL } from '../config/googleSheets.js';
 import { withRateLimit } from './rateLimiter.js';
 
-// Backend API URL - Railway backend
-const API_URL = 'https://hccc-db-production.up.railway.app';
+// Backend API URL - shared configuration
+import { API_URL } from '../config/api.js';
 
 // Internal submission function (without rate limiting)
 const _submitToBackend = async (formData) => {

@@ -1,10 +1,20 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      include: [/\.jsx?$/, /\.tsx?$/],
+    }),
+  ],
   assetsInclude: ['**/*.mov'],
+  resolve: {
+    alias: {
+      '@crm': path.resolve(__dirname, '../hccc-crm/src'),
+    },
+  },
   build: {
     // Optimize build for production
     minify: 'terser',
@@ -35,6 +45,9 @@ export default defineConfig({
     cors: true,
     host: true,
     strictPort: true,
+    fs: {
+      allow: ['..'],
+    },
     hmr: {
       protocol: 'ws',
       host: 'localhost',
@@ -48,6 +61,11 @@ export default defineConfig({
   // Optimize dependencies
   optimizeDeps: {
     include: ['react', 'react-dom'],
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx',
+      },
+    },
   },
   // Define environment variables
   define: {
