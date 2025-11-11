@@ -1,0 +1,11 @@
+[submodule "hccc-crm"]
+    path = hccc-crm
+    url = git@github.com/rradeba/hccc-crm.git
+
+[submodule "hccc-website"]
+    path = hccc-website
+    url = git@github.com/rradeba/hccc-website.git
+
+[submodule "hccc-db"]
+    path = hccc-db
+    url = git@github.com/rradeba/hccc-db.git
