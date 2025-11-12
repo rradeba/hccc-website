@@ -636,7 +636,8 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/route" element={<CRMPage />} />
+          <Route path="/crm" element={<CRMPage />} />
+          <Route path="/route" element={<Navigate to="/crm" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
