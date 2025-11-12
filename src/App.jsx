@@ -1,7 +1,8 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import logoImg from './assets/hccc-gate.png'
-import homeVideo from './assets/Home-video.mov'
+import homeVideoQuicktime from './assets/Home-video.mov'
+import heroVideo from './assets/new-website-bumper.mp4'
 import headshotImg from './assets/headshot.png'
 import before1 from './assets/before-1.jpeg'
 import after1 from './assets/after-1.jpeg'
@@ -137,16 +138,15 @@ function Home() {
             preload="metadata"
             poster={logoImg}
           >
-            {/* Prefer widely-supported MP4 if available in /public */}
-            <source src="/Home-video.mp4" type="video/mp4" />
-            <source src={homeVideo} type="video/quicktime" />
+            <source src={heroVideo} type="video/mp4" />
+            <source src={homeVideoQuicktime} type="video/quicktime" />
             Your browser does not support the video tag.
           </video>
           {/* Fallback link in case neither source plays */}
           <noscript>
             <p>
-              Video preview requires JavaScript. You can
-              <a href="/Home-video.mp4"> download the video</a> instead.
+              Video preview requires JavaScript. You can{' '}
+              <a href={heroVideo} download>download the video</a> instead.
             </p>
           </noscript>
           <a className="phone-badge" href="tel:18436096932" aria-label="Call Holy City Clean Co. for a free estimate">
