@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@crm': path.resolve(__dirname, '../hccc-crm/src'),
+      'lucide-react': path.resolve(__dirname, 'node_modules/lucide-react'),
     },
   },
   build: {
