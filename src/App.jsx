@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import logoImg from './assets/hccc-gate.png'
 import homeVideoQuicktime from './assets/Home-video.mov'
@@ -10,21 +10,8 @@ import before2 from './assets/before 2.jpeg'
 import after2 from './assets/after-2.jpeg'
 import { submitToGoogleSheets, formatFormData, validateFormData } from './utils/formSubmission'
 import { performanceMonitor, optimizeImages, preloadCriticalResources } from './utils/performance.js'
-import { API_URL } from './config/api.js'
+import CRMWrapper from './CRMWrapper.jsx'
 import './App.css'
-
-const CRMPage = lazy(async () => {
-  if (typeof globalThis.process === 'undefined') {
-    globalThis.process = { env: {} }
-  } else if (!globalThis.process.env) {
-    globalThis.process.env = {}
-  }
-  globalThis.process.env.REACT_APP_BACKEND_URL = API_URL
-  // Import CRM CSS to ensure proper styling
-  await import('@crm/index.css')
-  const module = await import('@crm/App.jsx')
-  return { default: module.default }
-})
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -638,7 +625,7 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/crm" element={<CRMPage />} />
+          <Route path="/crm" element={<CRMWrapper />} />
           <Route path="/route" element={<Navigate to="/crm" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
