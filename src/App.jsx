@@ -20,6 +20,8 @@ const CRMPage = lazy(async () => {
     globalThis.process.env = {}
   }
   globalThis.process.env.REACT_APP_BACKEND_URL = API_URL
+  // Import CRM CSS to ensure proper styling
+  await import('@crm/index.css')
   const module = await import('@crm/App.jsx')
   return { default: module.default }
 })
